@@ -7,12 +7,14 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    wallet_address = Column(String)
     pets = relationship("Pet", back_populates="owner")
 
 class Pet(Base):
     __tablename__ = "pets"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    species = Column(String, index=True)
+    species = Column(String, index=True, default="egg")
+    exp = Column(Integer)
     owner_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="pets")
