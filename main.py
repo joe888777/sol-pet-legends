@@ -3,8 +3,23 @@ from sqlalchemy.orm import Session
 import crud, models, schemas
 from database import SessionLocal, engine
 
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = [
+    "*"
+]
+
+
+
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def get_db():
     db = SessionLocal()
@@ -20,6 +35,10 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 @app.get("/users/{user_id}", response_model=schemas.User)
 def get_user(user_id: int, db: Session = Depends(get_db)):
     return crud.get_user(db, user_id)
+
+@app.get("/username/{user_name}", response_model=schemas.User)
+def get_user_by_username(user_name: str, db: Session = Depends(get_db)):
+    return crud.get_user_by_username(db, user_name)
 
 @app.put("/users/{user_id}", response_model=schemas.User)
 def update_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
