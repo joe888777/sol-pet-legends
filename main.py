@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import crud, models, schemas
 from database import SessionLocal, engine
-
+from utils import *
 from fastapi.middleware.cors import CORSMiddleware
 
 origins = [
@@ -37,7 +37,19 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.get("/username/{user_name}", response_model=schemas.User)
 def get_user_by_username(user_name: str, db: Session = Depends(get_db)):
-    return crud.get_user_by_username(db, user_name)
+    txs = get_tx_history(user_name);
+    user = crud.get_user_by_username(db, user_name)
+    pets = crud.list_pets(db =db, owner_id = user.id)
+    crud.update_pet(
+        db,
+        pets[0].id,
+        {
+            'exp': pets[0].exp + len(txs),
+            "name": pets[0].name,
+            "species": pets[0].species
+        }
+    )
+    return user
 
 @app.put("/users/{user_id}", response_model=schemas.User)
 def update_user(user: schemas.UserCreate, db: Session = Depends(get_db)):

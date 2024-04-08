@@ -15,10 +15,9 @@ class Pet(PetBase):
         orm_mode = True
 
 class PetUpdate(BaseModel):
-    id: int
-    name: str
-    species: str
-    exp: int
+    name: Optional[str] = None
+    species: Optional[str] = None
+    exp: Optional[int] = None
 
 class UserBase(BaseModel):
     username: str
